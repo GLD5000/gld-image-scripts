@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "//image:process:jpg": "Process images, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
+    "image:process:jpg": "clear && node src/utils/file-scripts/imageProcessing/batchJpg.mjs",
+    "//image:process:webp": "Process images, converting png to jpg etc. to animated webp",
+    "image:process:webp": "clear && node src/utils/file-scripts/imageProcessing/batchWebp.mjs"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "sharp": "^0.34.2",
+    "webp-converter": "^2.3.3"
+  }
+}
