@@ -4,6 +4,7 @@ import { exec } from "child_process";
 import webp from "webp-converter";
 import { getImageDimensions } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
+import {webpmux_animateLocal} from "../../webp/webpConverterLocal.mjs"
 
 /**
  * Loop through list of files with name and path
@@ -42,7 +43,7 @@ export async function createWebPAnimation(fileListFullPath) {
       suffix: `_${width}_${height}`,
     });
     console.log(animationPath);
-    await webp.webpmux_animate(
+    await webpmux_animateLocal(
       outputFrames,
       animationPath,
       "0",
