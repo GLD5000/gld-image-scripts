@@ -56,7 +56,12 @@ export async function createWebPAnimation(fileListFullPath) {
   const ffmpegCommand = `"${ffmpeg.path}" -framerate 24 -i "${path.join(
     dirName,
     `%d.${extension}`
-  )}" -c:v libx264 -pix_fmt yuv420p "${path.join(dirName,'processed', "output.mp4")}"`;
+  )}" -c:v libx264 -pix_fmt yuv420p "${path.join(
+    dirName,
+    "processed",
+    "processedAnimation",
+    "output.mp4"
+  )}"`;
   console.log(ffmpegCommand);
   exec(ffmpegCommand, (error, stdout, stderr) => {
     if (error) {
