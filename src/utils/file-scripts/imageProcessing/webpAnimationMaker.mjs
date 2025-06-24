@@ -33,7 +33,7 @@ export async function createWebPAnimation(fileListFullPath) {
     }
   }
   const outputFrames = outputArray.map((outputPath) => {
-    return { path: outputPath, offset: "+900" };
+    return { path: outputPath, offset: "+1000" };
   });
   try {
     const { width, height } = await getImageDimensions(outputArray[0]);
@@ -54,17 +54,16 @@ export async function createWebPAnimation(fileListFullPath) {
     console.log("Error with webpmux_animate", error);
   }
   const { extension, dirName } = getPathParts(fileListFullPath[0]);
-  const ffmpegCommand = `"${
-    ffmpeg.path
-  }" -framerate 1 -i "${path.join(
+  // -stream_loop -1
+  const ffmpegCommand = `"${ffmpeg.path}" -framerate 1 -i "${path.join(
     dirName,
     `%d.${extension}`
-  )}" -c:v libx264 -pix_fmt yuv420p "${path.join(
+  )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
     dirName,
     "processed",
     "processedAnimation",
     "output.mp4"
-  )}"`;// -stream_loop -1
+  )}"`;
   console.log(ffmpegCommand);
   exec(ffmpegCommand, (error, stdout, stderr) => {
     if (error) {
