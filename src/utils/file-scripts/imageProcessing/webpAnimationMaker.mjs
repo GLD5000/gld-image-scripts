@@ -4,7 +4,7 @@ import { exec } from "child_process";
 import webp from "webp-converter";
 import { getImageDimensions } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
-import {webpmux_animateLocal} from "../../webp/webpConverterLocal.mjs"
+import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
 
 /**
  * Loop through list of files with name and path
@@ -54,7 +54,9 @@ export async function createWebPAnimation(fileListFullPath) {
     console.log("Error with webpmux_animate", error);
   }
   const { extension, dirName } = getPathParts(fileListFullPath[0]);
-  const ffmpegCommand = `"${ffmpeg.path}" -framerate 24 -i "${path.join(
+  const ffmpegCommand = `"${
+    ffmpeg.path
+  }" -framerate 1 -i "${path.join(
     dirName,
     `%d.${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p "${path.join(
@@ -62,12 +64,15 @@ export async function createWebPAnimation(fileListFullPath) {
     "processed",
     "processedAnimation",
     "output.mp4"
-  )}"`;
+  )}"`;// -stream_loop -1
   console.log(ffmpegCommand);
   exec(ffmpegCommand, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error: ${error}`);
       return;
+    }
+    if (stdout) {
+      console.log("stdout", stdout);
     }
 
     if (stderr) {
@@ -108,10 +113,6 @@ function isImageFile(fileName) {
     fileName.indexOf(".png") > -1
   );
 }
-// function commandLineSpaceWrap(pathIn, index = 1) {
-//   return index ? `${pathIn}` : `"${pathIn}"`; // `${pathIn.split('\\').map(subsection => `"${subsection}"`).join('\\')}`
-// }
-
 function getPathParts(fileFullPath) {
   const baseName = path.basename(fileFullPath);
   const dirName = path.dirname(fileFullPath);
