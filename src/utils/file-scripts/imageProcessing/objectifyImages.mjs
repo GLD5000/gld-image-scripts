@@ -1,4 +1,4 @@
-import { listFileNames } from './fileOperations.mjs';
+import { listFileNames } from '../general/fileOperations.mjs';
 import { makeImageObjectsV2 } from './createImageObjectsV2.mjs';
 import { saveImageObject } from './saveImageObject.mjs';
 

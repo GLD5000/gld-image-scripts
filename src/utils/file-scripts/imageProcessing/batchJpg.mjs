@@ -1,6 +1,6 @@
-import { listFileFullPaths } from './fileOperations.mjs';
+import { listFileFullPaths } from '../general/fileOperations.mjs';
 import { renameFiles } from './imageEditing.mjs';
-import { createTimestamp } from './timestamp.mjs';
+import { createTimestamp } from '../general/timestamp.mjs';
 import { makeImageObjectsV4 } from './createImageObjectsV4.mjs';
 import { saveImageObject } from './saveImageObject.mjs';
 import path from 'path';

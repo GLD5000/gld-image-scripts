@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { createTimestamp } from "./timestamp.mjs";
+import { createTimestamp } from "../general/timestamp.mjs";
 
 export function saveImageObject(objectIn, pathIn) {
   const quoteRegex = /"(imageDimensions\[[^\]]+\])"/g;

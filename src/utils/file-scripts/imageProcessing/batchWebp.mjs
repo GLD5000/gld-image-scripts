@@ -1,7 +1,5 @@
-import { listFileFullPaths } from './fileOperations.mjs';
-import { createTimestamp } from './timestamp.mjs';
-import { makeImageObjectsV4 } from './createImageObjectsV4.mjs';
-import { saveImageObject } from './saveImageObject.mjs';
+import { listFileFullPaths } from '../general/fileOperations.mjs';
+import { createTimestamp } from '../general/timestamp.mjs';
 import { createWebPAnimation } from './webpAnimationMaker.mjs';
 
 console.log('starting', createTimestamp());
