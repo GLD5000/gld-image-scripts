@@ -1,4 +1,5 @@
 import * as readline from 'readline';
+import { isImageFile } from '../general/fileTypeTests.mjs';
 
 export async function makeImageObjects(files) {
     return new Promise((resolve, reject) => {
@@ -60,6 +61,3 @@ function extractWidthHeight(fileName) {
     return { widthPx, heightPx, widthRem, heightRem };
 }
 
-function isImageFile(fileName) {
-    return fileName.indexOf('.jpg') > -1 || fileName.indexOf('.png') > -1;
-}

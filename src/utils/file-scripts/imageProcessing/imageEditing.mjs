@@ -2,6 +2,7 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import { selectLineFromText } from '../general/selectLineFromText.mjs';
+import { isPngFile, isImageFile } from '../general/fileTypeTests.mjs';
 
 /**
  * Loop through list of files with name and path
@@ -83,24 +84,7 @@ async function copyFileToProcessed(fileFullPath) {
     return destination;
 }
 
-/**
- * Check if file is image
- *
- * @param {string} file
- * @returns {Boolean}
- */
-function isImageFile(file) {
-    return ['.jpg', '.png', '.jpeg', '.gif'].includes(path.extname(file));
-}
-/**
- * Check if file is PNG
- *
- * @param {string} file
- * @returns {Boolean}
- */
-function isPngFile(file) {
-    return file.endsWith('.png');
-}
+
 
 /**
  * Take in file with full path

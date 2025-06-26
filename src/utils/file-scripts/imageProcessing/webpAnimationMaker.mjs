@@ -5,6 +5,7 @@ import webp from "webp-converter";
 import { getImageDimensions } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
+import { isImageFile } from "../general/fileTypeTests.mjs";
 
 /**
  * Loop through list of files with name and path
@@ -104,13 +105,6 @@ async function getTargetPathWebp(fileFullPath, options) {
     await fs.mkdir(newPath);
   }
   return destination;
-}
-function isImageFile(fileName) {
-  return (
-    fileName.indexOf(".jpg") > -1 ||
-    fileName.indexOf(".webp") > -1 ||
-    fileName.indexOf(".png") > -1
-  );
 }
 function getPathParts(fileFullPath) {
   const baseName = path.basename(fileFullPath);

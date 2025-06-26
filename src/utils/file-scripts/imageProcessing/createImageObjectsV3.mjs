@@ -1,5 +1,7 @@
 import * as readline from 'readline';
 import path from 'path';
+import { isImageFile } from '../general/fileTypeTests.mjs';
+
 
 /**
  * Makes JSON objects for image files
@@ -126,9 +128,7 @@ function extractWidthHeight(fileName) {
     return { widthPx, heightPx, widthRem, heightRem };
 }
 
-function isImageFile(fileName) {
-    return fileName.indexOf('.jpg') > -1 || fileName.indexOf('.png') > -1;
-}
+
 
 function getImageMapper(objectName, images) {
     const returnObject = {};
