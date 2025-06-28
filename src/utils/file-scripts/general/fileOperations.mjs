@@ -152,3 +152,56 @@ export async function listFileFullPathsMulti(inputPath) {
     });
   });
 }
+/**
+ * Take in filename with path
+ * Create 'processed' directory (if does not exist)
+ * return target filename with path
+ * @param {string} fileFullPath
+ * @param {{suffix: string; extension: string; folder: string; subFolder: string|undefined; fileName: string|undefined}} options
+ * @returns {Promise<string>}
+ */
+export async function getTargetPath(fileFullPath, options) {
+  const {
+    suffix = "",
+    extension = "webp",
+    folder = "processed",
+    subFolder = undefined,
+    fileName = undefined,
+  } = options || {};
+  const pathName = path.dirname(fileFullPath);
+  const baseNameNoExt = fileName || path.basename(fileFullPath).split(".")[0];
+  const baseName = `${baseNameNoExt}${suffix}.${extension}`;
+  const newPath = subFolder
+    ? await addFolderToPath(await addFolderToPath(pathName, folder), subFolder)
+    : await addFolderToPath(pathName, folder);
+  const destination = path.join(newPath, baseName);
+  return destination;
+}
+/**
+ *
+ * @param {string} pathName
+ * @param {string} folder
+ * @returns {promise<string>}
+ */
+export async function addFolderToPath(pathName, folder) {
+  const newPath = path.join(pathName, folder);
+  try {
+    await fs.access(newPath);
+    return newPath;
+  } catch (error) {
+    await fs.mkdir(newPath);
+    return newPath;
+  }
+}
+
+/**
+ *
+ * @param {string} fileFullPath
+ * @returns  { {baseName:string; baseNameNoExtension:string; extension:string; dirName:string;} }
+ */
+export function getPathParts(fileFullPath) {
+  const baseName = path.basename(fileFullPath);
+  const dirName = path.dirname(fileFullPath);
+  const [baseNameNoExtension, extension] = baseName.split(".");
+  return { baseName, baseNameNoExtension, extension, dirName };
+}

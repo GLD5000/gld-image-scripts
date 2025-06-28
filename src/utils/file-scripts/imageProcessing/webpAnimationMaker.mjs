@@ -1,4 +1,3 @@
-import fs from "fs/promises";
 import path from "path";
 import { exec } from "child_process";
 import webp from "webp-converter";
@@ -6,6 +5,8 @@ import { getImageDimensions } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
 import { isImageFile } from "../general/fileTypeTests.mjs";
+import { getTargetPath,getPathParts } from "../general/fileOperations.mjs";
+
 
 /**
  * Loop through list of files with name and path
@@ -120,56 +121,6 @@ async function makeWebpFrames(fileListFullPath, parentDirectory) {
   return outputArray;
 }
 
-/**
- * Take in filename with path
- * Create 'processed' directory (if does not exist)
- * return target filename with path
- * @param {string} fileFullPath
- * @param {{suffix: string; extension: string; folder: string; subFolder: string|undefined; fileName: string|undefined}} options
- * @returns {Promise<string>}
- */
-async function getTargetPath(fileFullPath, options) {
-  const {
-    suffix = "",
-    extension = "webp",
-    folder = "processed",
-    subFolder = undefined,
-    fileName = undefined,
-  } = options || {};
-  const pathName = path.dirname(fileFullPath);
-  const baseNameNoExt = fileName || path.basename(fileFullPath).split(".")[0];
-  const baseName = `${baseNameNoExt}${suffix}.${extension}`;
-  const newPath = subFolder
-    ? await addFolderToPath(await addFolderToPath(pathName, folder), subFolder)
-    : await addFolderToPath(pathName, folder);
-  const destination = path.join(newPath, baseName);
-  return destination;
-}
-/**
- *
- * @param {string} pathName
- * @param {string} folder
- * @returns {promise<string>}
- */
-async function addFolderToPath(pathName, folder) {
-  const newPath = path.join(pathName, folder);
-  try {
-    await fs.access(newPath);
-    return newPath;
-  } catch (error) {
-    await fs.mkdir(newPath);
-    return newPath;
-  }
-}
 
-/**
- *
- * @param {string} fileFullPath
- * @returns  { {baseName:string; baseNameNoExtension:string; extension:string; dirName:string;} }
- */
-function getPathParts(fileFullPath) {
-  const baseName = path.basename(fileFullPath);
-  const dirName = path.dirname(fileFullPath);
-  const [baseNameNoExtension, extension] = baseName.split(".");
-  return { baseName, baseNameNoExtension, extension, dirName };
-}
+
+
