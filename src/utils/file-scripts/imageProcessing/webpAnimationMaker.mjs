@@ -1,7 +1,7 @@
 import path from "path";
 import { exec } from "child_process";
 import webp from "webp-converter";
-import { getImageDimensions } from "../imageProcessing/imageEditing.mjs";
+import { getImageDimensions, getEvenImageDimensions } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
 import { isImageFile } from "../general/fileTypeTests.mjs";
@@ -101,8 +101,10 @@ async function makeWebpAnimation(outputArray, parentDirectory) {
  */
 async function makeWebpFrames(fileListFullPath, parentDirectory) {
   const outputArray = [];
+  const {width,height,shouldCrop} = getEvenImageDimensions(fileListFullPath[0])
   for (const file of fileListFullPath) {
-    if (isImageFile(file)) {
+    const isImage = isImageFile(file);
+    if (isImage && !shouldCrop) {
       try {
         const outputPath = parentDirectory
           ? await getTargetPath(parentDirectory, {
@@ -116,6 +118,9 @@ async function makeWebpFrames(fileListFullPath, parentDirectory) {
       } catch (error) {
         console.log("Error with cwebp", error);
       }
+    } else if (isImage && shouldCrop) {
+      // get extracted image
+      //put old in 'old' folder 
     }
   }
   return outputArray;
