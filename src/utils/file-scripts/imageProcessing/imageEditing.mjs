@@ -3,7 +3,6 @@ import fs from "fs/promises";
 import path from "path";
 import { selectLineFromText } from "../general/selectLineFromText.mjs";
 import { isPngFile, isImageFile } from "../general/fileTypeTests.mjs";
-import { getTargetPath } from "../general/fileOperations.mjs";
 
 /**
  * Loop through list of files with name and path
@@ -49,7 +48,7 @@ export async function renameFiles(fileListFullPath) {
  * @returns {Promise<string[]>}
  */
 async function processAndCopyFile(fileFullPath, isPng, pngStrategy) {
-  const workingFile = await copyFileToProcessed(fileFullPath);
+  const workingFile = await copyFileToNewFolder(fileFullPath);
   if (!isPng || pngStrategy === "keep") return [workingFile];
   const shouldDelete = pngStrategy === "convert";
   return await convertPngToJpg(workingFile, shouldDelete);
@@ -62,11 +61,11 @@ async function processAndCopyFile(fileFullPath, isPng, pngStrategy) {
  * @param {string[]} fileListFullPath
  * @returns {Promise<string>}
  */
-async function copyFileToProcessed(fileFullPath) {
+export async function copyFileToNewFolder(fileFullPath, folderName= 'processed') {
   const pathName = path.dirname(fileFullPath);
   const baseName = path.basename(fileFullPath);
   const origin = fileFullPath;
-  const newPath = path.join(pathName, "processed");
+  const newPath = path.join(pathName, folderName);
   const destination = path.join(newPath, baseName);
   try {
     await fs.access(newPath);
@@ -187,7 +186,6 @@ function moveBreakpointToFilenameEnd(filename) {
     ? `${filename.replace(breakpoint, "").replace(/^\-/, "")}-${breakpoint}`
     : filename;
 }
-
 /**
  *
  * @param {string} fileNameFullPath

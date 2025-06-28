@@ -1,12 +1,14 @@
 import path from "path";
 import { exec } from "child_process";
 import webp from "webp-converter";
-import { getImageDimensions, getEvenImageDimensions } from "../imageProcessing/imageEditing.mjs";
+import {
+  getImageDimensions,
+  getEvenImageDimensions,
+} from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
 import { isImageFile } from "../general/fileTypeTests.mjs";
-import { getTargetPath,getPathParts } from "../general/fileOperations.mjs";
-
+import { getTargetPath, getPathParts } from "../general/fileOperations.mjs";
 
 /**
  * Loop through list of files with name and path
@@ -37,10 +39,10 @@ async function makeMp4Animation(fileListFullPath, parentDirectory) {
 
   // -stream_loop -1
   const ffmpegCommand = `"${ffmpeg.path}" -framerate 1 -i "${path.join(
-     dirName,
+    dirName,
     `%d.${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
-   parentDirectory | dirName,
+    parentDirectory | dirName,
     "processed",
     "animations",
     `output_${width}_${height}.mp4`
@@ -101,31 +103,44 @@ async function makeWebpAnimation(outputArray, parentDirectory) {
  */
 async function makeWebpFrames(fileListFullPath, parentDirectory) {
   const outputArray = [];
-  const {width,height,shouldCrop} = getEvenImageDimensions(fileListFullPath[0])
+  const { width, height, shouldCrop } = getEvenImageDimensions(
+    fileListFullPath[0]
+  );
   for (const file of fileListFullPath) {
     const isImage = isImageFile(file);
-    if (isImage && !shouldCrop) {
-      try {
-        const outputPath = parentDirectory
-          ? await getTargetPath(parentDirectory, {
-              fileName: path.basename(file).split(".")[0],
-              subFolder: "frames",
-            })
-          : await getTargetPath(file, { subFolder: "frames" });
-        await webp.cwebp(file, outputPath);
-        outputArray.push(outputPath);
-        console.log("Created webp:", outputPath);
-      } catch (error) {
-        console.log("Error with cwebp", error);
-      }
-    } else if (isImage && shouldCrop) {
-      // get extracted image
-      //put old in 'old' folder 
-    }
+    if (isImage) {
+      shouldCrop && await cropInputFrame(file, width, height); // Crop as needed
+     return await makeWebpFrame(parentDirectory, file, outputArray);
+    } 
+  }
+}
+async function cropInputFrame(file, width, height) {
+  copyFileToNewFolder(file, "old");
+  await sharp(tempPath)
+    .extract({ left: 0, top: 0, width, height })
+    .toFile(file);
+}
+/**
+ * 
+ * @param {string} parentDirectory 
+ * @param {string} file 
+ * @param {string[]} outputArray 
+ * @returns 
+ */
+async function makeWebpFrame(parentDirectory, file, outputArray) {
+  try {
+    const outputPath = parentDirectory
+      ? await getTargetPath(parentDirectory, {
+        fileName: path.basename(file).split(".")[0],
+        subFolder: "frames",
+      })
+      : await getTargetPath(file, { subFolder: "frames" });
+    await webp.cwebp(file, outputPath);
+    outputArray.push(outputPath);
+    console.log("Created webp:", outputPath);
+  } catch (error) {
+    console.log("Error with cwebp", error);
   }
   return outputArray;
 }
-
-
-
 
