@@ -30,17 +30,19 @@ export async function createWebPAnimation(fileListFullPath, parentDirectory) {
  * @param {string|undefined} parentDirectory
  * @returns {void}
  */
-function makeMp4Animation(fileListFullPath, parentDirectory) {
+async function makeMp4Animation(fileListFullPath, parentDirectory) {
   const { extension, dirName } = getPathParts(fileListFullPath[0]);
+  const { width, height } = await getImageDimensions(outputArray[0]);
+
   // -stream_loop -1
   const ffmpegCommand = `"${ffmpeg.path}" -framerate 1 -i "${path.join(
-    parentDirectory | dirName,
+     dirName,
     `%d.${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
-    dirName,
+   parentDirectory | dirName,
     "processed",
-    "processedAnimation",
-    "output.mp4"
+    "animations",
+    `output_${width}_${height}.mp4`
   )}"`;
   console.log(ffmpegCommand);
   exec(ffmpegCommand, (error, stdout, stderr) => {
@@ -72,7 +74,8 @@ async function makeWebpAnimation(outputArray, parentDirectory) {
     const animationPath = await getTargetPath(
       parentDirectory || outputArray[0],
       {
-        folder: "processedAnimation",
+        folder: "processed",
+        subFolder: "animations",
         fileName: "output",
         suffix: `_${width}_${height}`,
       }
@@ -103,8 +106,9 @@ async function makeWebpFrames(fileListFullPath, parentDirectory) {
         const outputPath = parentDirectory
           ? await getTargetPath(parentDirectory, {
               fileName: path.basename(file).split(".")[0],
+              subFolder: "frames",
             })
-          : await getTargetPath(file);
+          : await getTargetPath(file, { subFolder: "frames" });
         await webp.cwebp(file, outputPath);
         outputArray.push(outputPath);
         console.log("Created webp:", outputPath);
@@ -121,7 +125,7 @@ async function makeWebpFrames(fileListFullPath, parentDirectory) {
  * Create 'processed' directory (if does not exist)
  * return target filename with path
  * @param {string} fileFullPath
- * @param {{suffix: string; extension: string; folder: string; fileName: string}} options
+ * @param {{suffix: string; extension: string; folder: string; subFolder: string|undefined; fileName: string|undefined}} options
  * @returns {Promise<string>}
  */
 async function getTargetPath(fileFullPath, options) {
@@ -129,20 +133,35 @@ async function getTargetPath(fileFullPath, options) {
     suffix = "",
     extension = "webp",
     folder = "processed",
+    subFolder = undefined,
     fileName = undefined,
   } = options || {};
   const pathName = path.dirname(fileFullPath);
   const baseNameNoExt = fileName || path.basename(fileFullPath).split(".")[0];
   const baseName = `${baseNameNoExt}${suffix}.${extension}`;
-  const newPath = path.join(pathName, folder);
+  const newPath = subFolder
+    ? await addFolderToPath(await addFolderToPath(pathName, folder), subFolder)
+    : await addFolderToPath(pathName, folder);
   const destination = path.join(newPath, baseName);
-  try {
-    await fs.access(newPath);
-  } catch (error) {
-    await fs.mkdir(newPath);
-  }
   return destination;
 }
+/**
+ *
+ * @param {string} pathName
+ * @param {string} folder
+ * @returns {promise<string>}
+ */
+async function addFolderToPath(pathName, folder) {
+  const newPath = path.join(pathName, folder);
+  try {
+    await fs.access(newPath);
+    return newPath;
+  } catch (error) {
+    await fs.mkdir(newPath);
+    return newPath;
+  }
+}
+
 /**
  *
  * @param {string} fileFullPath
