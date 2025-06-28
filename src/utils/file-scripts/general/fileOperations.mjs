@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import path from "path";
 import * as readline from "readline";
+import { isFolder } from "./fileTypeTests.mjs";
 
 /**
  * Get list of files from given path
@@ -9,6 +10,14 @@ import * as readline from "readline";
  */
 function getFileList(inputPath) {
   return fs.readdirSync(inputPath);
+}
+/**
+ * Get list of files from given path
+ * @param {string} inputPath
+ * @returns {string[]}
+ */
+function getFolderList(inputPath) {
+  return getFileList(inputPath).filter((file) => isFolder(file));
 }
 /**
  * Get list of files with paths from given path
@@ -112,10 +121,10 @@ export async function listFileFullPathsMulti(inputPath) {
       input: process.stdin,
       output: process.stdout,
     });
-
     if (inputPath) {
+      const folderList = getFolderList(inputPath);
       resolve({
-        fileList: getFileListFullPath(inputPath),
+        fileLists: folderList.map((folder) => listFileFullPaths(folder)),
         inputPath,
       });
       rl.close();
@@ -129,8 +138,9 @@ export async function listFileFullPathsMulti(inputPath) {
       }
 
       try {
-        resolve({
-          fileList: getFileListFullPath(dirPath),
+      const folderList = getFolderList(inputPath);
+      resolve({
+        fileLists: folderList.map((folder) => listFileFullPaths(folder)),
           inputPath: dirPath,
         });
       } catch (error) {
