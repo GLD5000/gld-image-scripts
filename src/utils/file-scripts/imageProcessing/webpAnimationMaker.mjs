@@ -15,49 +15,26 @@ import { isImageFile } from "../general/fileTypeTests.mjs";
  * @param {string[]} fileListFullPath
  * @returns {Promise<{newFileList: string[], backupList: string[]}>}
  */
-export async function createWebPAnimation(fileListFullPath) {
+export async function createWebPAnimation(fileListFullPath, parentDirectory) {
   // Validate inputs
   if (!Array.isArray(fileListFullPath) || fileListFullPath.length === 0) {
     throw new Error("Input files must be a non-empty array");
   }
-  const outputArray = [];
-  for (const file of fileListFullPath) {
-    if (isImageFile(file)) {
-      try {
-        const outputPath = await getTargetPathWebp(file);
-        await webp.cwebp(file, outputPath);
-        outputArray.push(outputPath);
-        console.log("Created webp:", outputPath);
-      } catch (error) {
-        console.log("Error with cwebp", error);
-      }
-    }
-  }
-  const outputFrames = outputArray.map((outputPath) => {
-    return { path: outputPath, offset: "+1000" };
-  });
-  try {
-    const { width, height } = await getImageDimensions(outputArray[0]);
-    const animationPath = await getTargetPathWebp(outputArray[0], {
-      folder: "processedAnimation",
-      fileName: "output",
-      suffix: `_${width}_${height}`,
-    });
-    console.log(animationPath);
-    await webpmux_animateLocal(
-      outputFrames,
-      animationPath,
-      "0",
-      "255,255,255,255"
-    );
-    console.log("Created webpmux_animate:", animationPath);
-  } catch (error) {
-    console.log("Error with webpmux_animate", error);
-  }
+  const outputArray = await makeWebpFrames(fileListFullPath, parentDirectory);
+  await makeWebpAnimation(outputArray, parentDirectory);
+  makeMp4Animation(fileListFullPath);
+}
+/**
+ *
+ * @param {string} fileListFullPath
+ * @param {string|undefined} parentDirectory
+ * @returns {void}
+ */
+function makeMp4Animation(fileListFullPath, parentDirectory) {
   const { extension, dirName } = getPathParts(fileListFullPath[0]);
   // -stream_loop -1
   const ffmpegCommand = `"${ffmpeg.path}" -framerate 1 -i "${path.join(
-    dirName,
+    parentDirectory | dirName,
     `%d.${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
     dirName,
@@ -81,13 +58,73 @@ export async function createWebPAnimation(fileListFullPath) {
   });
 }
 /**
+ *
+ * @param {string} outputArray
+ * @param {string|undefined} parentDirectory
+ * @returns {void}
+ */
+async function makeWebpAnimation(outputArray, parentDirectory) {
+  const outputFrames = outputArray.map((outputPath) => {
+    return { path: outputPath, offset: "+1000" };
+  });
+  try {
+    const { width, height } = await getImageDimensions(outputArray[0]);
+    const animationPath = await getTargetPath(
+      parentDirectory || outputArray[0],
+      {
+        folder: "processedAnimation",
+        fileName: "output",
+        suffix: `_${width}_${height}`,
+      }
+    );
+    console.log(animationPath);
+    await webpmux_animateLocal(
+      outputFrames,
+      animationPath,
+      "0",
+      "255,255,255,255"
+    );
+    console.log("Created webpmux_animate:", animationPath);
+  } catch (error) {
+    console.log("Error with webpmux_animate", error);
+  }
+}
+/**
+ *
+ * @param {string} fileListFullPath
+ * @param {string} parentDirectory
+ * @returns {string[]}
+ */
+async function makeWebpFrames(fileListFullPath, parentDirectory) {
+  const outputArray = [];
+  for (const file of fileListFullPath) {
+    if (isImageFile(file)) {
+      try {
+        const outputPath = parentDirectory
+          ? await getTargetPath(parentDirectory, {
+              fileName: path.basename(file).split(".")[0],
+            })
+          : await getTargetPath(file);
+        await webp.cwebp(file, outputPath);
+        outputArray.push(outputPath);
+        console.log("Created webp:", outputPath);
+      } catch (error) {
+        console.log("Error with cwebp", error);
+      }
+    }
+  }
+  return outputArray;
+}
+
+/**
  * Take in filename with path
  * Create 'processed' directory (if does not exist)
  * return target filename with path
  * @param {string} fileFullPath
+ * @param {{suffix: string; extension: string; folder: string; fileName: string}} options
  * @returns {Promise<string>}
  */
-async function getTargetPathWebp(fileFullPath, options) {
+async function getTargetPath(fileFullPath, options) {
   const {
     suffix = "",
     extension = "webp",
@@ -106,6 +143,11 @@ async function getTargetPathWebp(fileFullPath, options) {
   }
   return destination;
 }
+/**
+ *
+ * @param {string} fileFullPath
+ * @returns  { {baseName:string; baseNameNoExtension:string; extension:string; dirName:string;} }
+ */
 function getPathParts(fileFullPath) {
   const baseName = path.basename(fileFullPath);
   const dirName = path.dirname(fileFullPath);
