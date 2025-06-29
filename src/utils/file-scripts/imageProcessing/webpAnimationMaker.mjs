@@ -9,6 +9,8 @@ import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
 import { isImageFile } from "../general/fileTypeTests.mjs";
 import { getTargetPath, getPathParts } from "../general/fileOperations.mjs";
+import sharp from "sharp";
+
 
 /**
  * Loop through list of files with name and path
