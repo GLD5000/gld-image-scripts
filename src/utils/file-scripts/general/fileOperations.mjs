@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as fsAsync from "fs/promises";
 import path from "path";
 import * as readline from "readline";
 import { isFolder } from "./fileTypeTests.mjs";
@@ -138,9 +139,9 @@ export async function listFileFullPathsMulti(inputPath) {
       }
 
       try {
-      const folderList = getFolderList(inputPath);
-      resolve({
-        fileLists: folderList.map((folder) => listFileFullPaths(folder)),
+        const folderList = getFolderList(inputPath);
+        resolve({
+          fileLists: folderList.map((folder) => listFileFullPaths(folder)),
           inputPath: dirPath,
         });
       } catch (error) {
@@ -168,12 +169,19 @@ export async function getTargetPath(fileFullPath, options) {
     subFolder = undefined,
     fileName = undefined,
   } = options || {};
-  const pathName = path.dirname(fileFullPath);
+  console.log("fileFullPath:", fileFullPath);
+  console.log(JSON.stringify(options));
+  console.log(path.dirname(fileFullPath))
+  const pathName = subFolder
+    ? await addFolderToPath(path.dirname(fileFullPath), folder)
+    : path.dirname(fileFullPath);
+  console.log('pathName',fileFullPath)
   const baseNameNoExt = fileName || path.basename(fileFullPath).split(".")[0];
   const baseName = `${baseNameNoExt}${suffix}.${extension}`;
-  const newPath = subFolder
-    ? await addFolderToPath(await addFolderToPath(pathName, folder), subFolder)
-    : await addFolderToPath(pathName, folder);
+  const newPath = await addFolderToPath(
+    pathName,
+    subFolder ? subFolder : folder
+  );
   const destination = path.join(newPath, baseName);
   return destination;
 }
@@ -185,11 +193,12 @@ export async function getTargetPath(fileFullPath, options) {
  */
 export async function addFolderToPath(pathName, folder) {
   const newPath = path.join(pathName, folder);
+  console.log('newPath',newPath)
   try {
-    await fs.access(newPath);
+    await fsAsync.access(newPath);
     return newPath;
   } catch (error) {
-    await fs.mkdir(newPath);
+    await fsAsync.mkdir(newPath);
     return newPath;
   }
 }

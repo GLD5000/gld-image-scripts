@@ -37,14 +37,14 @@ export async function createWebPAnimation(fileListFullPath, parentDirectory) {
  */
 async function makeMp4Animation(fileListFullPath, parentDirectory) {
   const { extension, dirName } = getPathParts(fileListFullPath[0]);
-  const { width, height } = await getImageDimensions(outputArray[0]);
+  const { width, height } = await getImageDimensions(fileListFullPath[0]);
 
   // -stream_loop -1
   const ffmpegCommand = `"${ffmpeg.path}" -framerate 1 -i "${path.join(
     dirName,
     `%d.${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
-    parentDirectory | dirName,
+    parentDirectory || dirName,
     "processed",
     "animations",
     `output_${width}_${height}.mp4`
