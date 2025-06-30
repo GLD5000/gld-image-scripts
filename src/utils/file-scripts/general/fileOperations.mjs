@@ -158,30 +158,23 @@ export async function listFileFullPathsMulti(inputPath) {
  * Create 'processed' directory (if does not exist)
  * return target filename with path
  * @param {string} fileFullPath
- * @param {{suffix: string; extension: string; folder: string; subFolder: string|undefined; fileName: string|undefined}} options
+ * @param {{suffix: string; extension: string; folders: string[]|undefined; fileName: string|undefined}} options
  * @returns {Promise<string>}
  */
 export async function getTargetPath(fileFullPath, options) {
   const {
     suffix = "",
     extension = "webp",
-    folder = "processed",
-    subFolder = undefined,
+    folders = undefined,
     fileName = undefined,
   } = options || {};
-  console.log("fileFullPath:", fileFullPath);
-  console.log(JSON.stringify(options));
-  console.log(path.dirname(fileFullPath))
-  const pathName = subFolder
-    ? await addFolderToPath(path.dirname(fileFullPath), folder)
-    : path.dirname(fileFullPath);
-  console.log('pathName',fileFullPath)
+  const pathName = path.dirname(fileFullPath);
   const baseNameNoExt = fileName || path.basename(fileFullPath).split(".")[0];
   const baseName = `${baseNameNoExt}${suffix}.${extension}`;
-  const newPath = await addFolderToPath(
+  const newPath = folders && folders.length? await addFoldersToPath(
     pathName,
-    subFolder ? subFolder : folder
-  );
+    folders
+  ): pathName;
   const destination = path.join(newPath, baseName);
   return destination;
 }
@@ -193,7 +186,6 @@ export async function getTargetPath(fileFullPath, options) {
  */
 export async function addFolderToPath(pathName, folder) {
   const newPath = path.join(pathName, folder);
-  console.log('newPath',newPath)
   try {
     await fsAsync.access(newPath);
     return newPath;
@@ -201,6 +193,20 @@ export async function addFolderToPath(pathName, folder) {
     await fsAsync.mkdir(newPath);
     return newPath;
   }
+}
+/**
+ *
+ * @param {string} pathName
+ * @param {string} folder
+ * @returns {promise<string>}
+ */
+export async function addFoldersToPath(pathName, folders) {
+  let newPath = pathName;
+  for (let i in folders) {
+    newPath = await addFolderToPath(newPath, folders[i])
+  }
+
+    return newPath;
 }
 
 /**
