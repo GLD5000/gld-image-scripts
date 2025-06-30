@@ -3,7 +3,7 @@ import { exec } from "child_process";
 import webp from "webp-converter";
 import {
   getImageDimensions,
-  getEvenImageDimensions,
+  getEvenImageDimensions,copyFileToNewFolder
 } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
@@ -25,8 +25,8 @@ export async function createWebPAnimation(fileListFullPath, parentDirectory) {
   if (!Array.isArray(fileListFullPath) || fileListFullPath.length === 0) {
     throw new Error("Input files must be a non-empty array");
   }
-  const outputArray = await makeWebpFrames(fileListFullPath, parentDirectory);
-  await makeWebpAnimation(outputArray, parentDirectory);
+  const webpFrames = await makeWebpFrames(fileListFullPath, parentDirectory);
+  await makeWebpAnimation(webpFrames, parentDirectory);
   makeMp4Animation(fileListFullPath);
 }
 /**
@@ -105,20 +105,22 @@ async function makeWebpAnimation(outputArray, parentDirectory) {
  */
 async function makeWebpFrames(fileListFullPath, parentDirectory) {
   const outputArray = [];
-  const { width, height, shouldCrop } = getEvenImageDimensions(
+  const { width, height, shouldCrop } = await getEvenImageDimensions(
     fileListFullPath[0]
   );
+  console.log('shouldCrop',shouldCrop)
   for (const file of fileListFullPath) {
     const isImage = isImageFile(file);
     if (isImage) {
       shouldCrop && await cropInputFrame(file, width, height); // Crop as needed
-     return await makeWebpFrame(parentDirectory, file, outputArray);
+     outputArray.push(await makeWebpFrame(parentDirectory, file, outputArray));
     } 
   }
+  return outputArray;
 }
 async function cropInputFrame(file, width, height) {
-  copyFileToNewFolder(file, "old");
-  await sharp(tempPath)
+  const oldFile = await copyFileToNewFolder(file, "old");
+  await sharp(oldFile)
     .extract({ left: 0, top: 0, width, height })
     .toFile(file);
 }
@@ -129,7 +131,7 @@ async function cropInputFrame(file, width, height) {
  * @param {string[]} outputArray 
  * @returns 
  */
-async function makeWebpFrame(parentDirectory, file, outputArray) {
+async function makeWebpFrame(parentDirectory, file) {
   try {
     const outputPath = parentDirectory
       ? await getTargetPath(parentDirectory, {
@@ -138,11 +140,10 @@ async function makeWebpFrame(parentDirectory, file, outputArray) {
       })
       : await getTargetPath(file, { subFolder: "frames" });
     await webp.cwebp(file, outputPath);
-    outputArray.push(outputPath);
     console.log("Created webp:", outputPath);
+    return outputPath;
   } catch (error) {
     console.log("Error with cwebp", error);
   }
-  return outputArray;
 }
 
