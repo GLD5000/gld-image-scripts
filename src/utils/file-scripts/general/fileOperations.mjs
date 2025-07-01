@@ -26,7 +26,7 @@ function getFolderList(inputPath) {
  * @param {string} inputPath
  * @returns {string[]}
  */
-function getFileListFullPath(inputPath) {
+export function getFileListFullPath(inputPath) {
   const files = getFileList(inputPath);
 
   return files.map((fileName) => path.join(inputPath, fileName));
@@ -152,8 +152,6 @@ async function getSubfolderArrays(inputPath) {
   const folderList = getFolderList(inputPath);
   const fileLists = [];
   for (let i in folderList) {
-    console.log("folderList[i]", folderList[i]);
-
     fileLists.push(await listFileFullPaths(folderList[i]));
   }
   return {
