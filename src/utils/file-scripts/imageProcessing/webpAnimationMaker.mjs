@@ -20,22 +20,21 @@ import sharp from "sharp";
  * @param {string[]} fileListFullPath
  * @returns {Promise<{newFileList: string[], backupList: string[]}>}
  */
-export async function createWebPAnimation(fileListFullPath, parentDirectory) {
+export async function createWebPAnimation(fileListFullPath) {
   // Validate inputs
   if (!Array.isArray(fileListFullPath) || fileListFullPath.length === 0) {
     throw new Error("Input files must be a non-empty array");
   }
-  const webpFrames = await makeWebpFrames(fileListFullPath, parentDirectory);
-  await makeWebpAnimation(webpFrames, parentDirectory);
+  const webpFrames = await makeWebpFrames(fileListFullPath);
+  await makeWebpAnimation(webpFrames);
   makeMp4Animation(fileListFullPath);
 }
 /**
  *
  * @param {string} fileListFullPath
- * @param {string|undefined} parentDirectory
  * @returns {void}
  */
-async function makeMp4Animation(fileListFullPath, parentDirectory) {
+async function makeMp4Animation(fileListFullPath) {
   const { extension, dirName } = getPathParts(fileListFullPath[0]);
   const { width, height } = await getImageDimensions(fileListFullPath[0]);
 
@@ -44,7 +43,7 @@ async function makeMp4Animation(fileListFullPath, parentDirectory) {
     dirName,
     `%d.${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
-    parentDirectory || dirName,
+    dirName,
     "processed",
     `output_${width}_${height}.mp4`
   )}"`;
@@ -66,22 +65,18 @@ async function makeMp4Animation(fileListFullPath, parentDirectory) {
 /**
  *
  * @param {string} outputArray
- * @param {string|undefined} parentDirectory
  * @returns {void}
  */
-async function makeWebpAnimation(outputArray, parentDirectory) {
+async function makeWebpAnimation(outputArray) {
   const outputFrames = outputArray.map((outputPath) => {
     return { path: outputPath, offset: "+1000" };
   });
   try {
     const { width, height } = await getImageDimensions(outputArray[0]);
-    const animationPath = await getTargetPath(
-      parentDirectory || outputArray[0],
-      {
-        fileName: "output",
-        suffix: `_${width}_${height}`,
-      }
-    );
+    const animationPath = await getTargetPath(outputArray[0], {
+      fileName: "output",
+      suffix: `_${width}_${height}`,
+    });
     await webpmux_animateLocal(
       outputFrames,
       animationPath,
@@ -96,10 +91,9 @@ async function makeWebpAnimation(outputArray, parentDirectory) {
 /**
  *
  * @param {string} fileListFullPath
- * @param {string} parentDirectory
  * @returns {string[]}
  */
-async function makeWebpFrames(fileListFullPath, parentDirectory) {
+async function makeWebpFrames(fileListFullPath) {
   const outputArray = [];
   const { width, height, shouldCrop } = await getEvenImageDimensions(
     fileListFullPath[0]
@@ -108,7 +102,7 @@ async function makeWebpFrames(fileListFullPath, parentDirectory) {
     const isImage = isImageFile(file);
     if (isImage) {
       shouldCrop && (await cropInputFrame(file, width, height)); // Crop as needed
-      outputArray.push(await makeWebpFrame(parentDirectory, file));
+      outputArray.push(await makeWebpFrame(file));
     }
   }
   return outputArray;
@@ -119,19 +113,13 @@ async function cropInputFrame(file, width, height) {
 }
 /**
  *
- * @param {string} parentDirectory
  * @param {string} file
  * @param {string[]} outputArray
  * @returns
  */
-async function makeWebpFrame(parentDirectory, file) {
+async function makeWebpFrame(file) {
   try {
-    const outputPath = parentDirectory
-      ? await getTargetPath(parentDirectory, {
-          fileName: path.basename(file).split(".")[0],
-          folders: ["processed"],
-        })
-      : await getTargetPath(file, { folders: ["processed"] });
+    const outputPath = await getTargetPath(file, { folders: ["processed"] });
     await webp.cwebp(file, outputPath);
     console.log("Created webp:", outputPath);
     return outputPath;
