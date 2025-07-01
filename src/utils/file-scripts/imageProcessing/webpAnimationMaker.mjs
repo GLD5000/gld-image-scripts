@@ -45,6 +45,7 @@ async function makeMp4Animation(fileListFullPath) {
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
     dirName,
     "processed",
+    "animation",
     `output_${width}_${height}.mp4`
   )}"`;
   console.log(ffmpegCommand);
@@ -75,6 +76,7 @@ async function makeWebpAnimation(outputArray) {
     const { width, height } = await getImageDimensions(outputArray[0]);
     const animationPath = await getTargetPath(outputArray[0], {
       fileName: "output",
+      folders:['animation'],
       suffix: `_${width}_${height}`,
     });
     await webpmux_animateLocal(

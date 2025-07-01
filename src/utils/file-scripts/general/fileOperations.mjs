@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as fsAsync from "fs/promises";
 import path from "path";
-import * as readline from "readline";
+import * as readline from "node:readline/promises";
+// import * as readline from "readline";
 import { isFolder } from "./fileTypeTests.mjs";
 
 /**
@@ -44,25 +45,23 @@ export async function listFileNames(inputPath) {
       const fileList = getFileList(inputPath);
       return { fileList, inputPath };
     }
-
-    rl.question("Please enter the directory path: ", async (dirPath) => {
-      if (!dirPath.trim()) {
-        console.error(
-          "Input should not be blank. Using current working directory."
-        );
-        dirPath = process.cwd(); // Set dirPath to the current working directory
-      }
-
-      try {
-        const fileList = getFileList(dirPath);
-        return { fileList, inputPath: dirPath };
-      } catch (error) {
-        console.error(`Error reading directory ${dirPath}:`, error);
-        return JSON.stringify(error);
-      } finally {
+    let dirPath = await rl.question("Please enter the directory path: ");
+    try {
+      console.log("dirPath", dirPath);
+      if ( !dirPath.trim()) {
+        const err = new Error("Please enter a value");
+        console.error("Input should not be blank.", err);
         rl.close(); // Close the readline interface after operation
+        return err;
       }
-    });
+      const fileList = getFileList(dirPath);
+      return { fileList, inputPath: dirPath };
+    } catch (error) {
+      console.error(`Error reading directory ${dirPath}:`, error);
+      return JSON.stringify(error);
+    } finally {
+      rl.close(); // Close the readline interface after operation
+    }
   } catch (error) {
     console.log("error", error);
     return JSON.stringify(error);
@@ -85,26 +84,25 @@ export async function listFileFullPaths(inputPath) {
         inputPath,
       };
     }
-    rl.question("Please enter the directory path: ", (dirPath) => {
-      if (!dirPath.trim()) {
-        console.error(
-          "Input should not be blank. Using current working directory."
-        );
-        dirPath = process.cwd(); // Set dirPath to the current working directory
-      }
-
-      try {
-        return {
-          fileList: getFileListFullPath(dirPath),
-          inputPath: dirPath,
-        };
-      } catch (error) {
-        console.error(`Error reading directory ${dirPath}:`, error);
-        return JSON.stringify(error);
-      } finally {
+    let dirPath = await rl.question("Please enter the directory path: ");
+    try {
+      console.log("dirPath", dirPath);
+      if ( !dirPath.trim()) {
+        const err = new Error("Please enter a value");
+        console.error("Input should not be blank.", err);
         rl.close(); // Close the readline interface after operation
+        return err;
       }
-    });
+      return {
+        fileList: getFileListFullPath(dirPath),
+        inputPath: dirPath,
+      };
+    } catch (error) {
+      console.error(`Error reading directory ${dirPath}:`, error);
+      return JSON.stringify(error);
+    } finally {
+      rl.close(); // Close the readline interface after operation
+    }
   } catch (error) {
     return JSON.stringify(error);
   }
@@ -115,30 +113,30 @@ export async function listFileFullPaths(inputPath) {
  * @param {string | undefined} inputPath
  * @returns {Promise<{fileList: string[], inputPath: string}>}
  */
-export async function listFileFullPathsMulti(inputPath) {
+export async function listFileFullPathsMulti(inputPath = undefined) {
   try {
     const rl = getReadLine();
     if (inputPath) {
+      console.log("inputPath", inputPath);
       rl.close();
       return await getSubfolderArrays(inputPath);
     }
-    rl.question("Please enter the directory path: ", async (dirPath) => {
-      if (!dirPath.trim()) {
-        console.error(
-          "Input should not be blank. Using current working directory."
-        );
-        dirPath = process.cwd(); // Set dirPath to the current working directory
-      }
-
-      try {
-        return await getSubfolderArrays(dirPath);
-      } catch (error) {
-        console.error(`Error reading directory ${dirPath}:`, error);
-        return JSON.stringify(error);
-      } finally {
+    let dirPath = await rl.question("Please enter the directory path: ");
+    try {
+      console.log("dirPath", dirPath);
+      if (!! !dirPath.trim()) {
+        const err = new Error("Please enter a value");
+        console.error("Input should not be blank.", err);
         rl.close(); // Close the readline interface after operation
+        return err;
       }
-    });
+      return await getSubfolderArrays(dirPath);
+    } catch (error) {
+      console.error(`Error reading directory ${dirPath}:`, error);
+      return JSON.stringify(error);
+    } finally {
+      rl.close(); // Close the readline interface after operation
+    }
   } catch (error) {
     console.error(error);
     return JSON.stringify(error);
@@ -150,7 +148,6 @@ function getReadLine() {
     output: process.stdout,
   });
 }
-
 async function getSubfolderArrays(inputPath) {
   const folderList = getFolderList(inputPath);
   const fileLists = [];
@@ -164,7 +161,6 @@ async function getSubfolderArrays(inputPath) {
     inputPath,
   };
 }
-
 /**
  * Take in filename with path
  * Create 'processed' directory (if does not exist)
@@ -220,7 +216,6 @@ export async function addFoldersToPath(pathName, folders) {
 
   return newPath;
 }
-
 /**
  *
  * @param {string} fileFullPath
