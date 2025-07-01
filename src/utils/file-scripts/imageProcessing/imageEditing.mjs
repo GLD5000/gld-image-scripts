@@ -40,6 +40,32 @@ export async function renameFiles(fileListFullPath) {
   }
 }
 
+
+/**
+ * Take in filename with path
+ * Create 'processed' directory (if does not exist)
+ * Copy files to 'processed' directory
+ * @param {string[]} fileListFullPath
+ * @returns {Promise<string>}
+ */
+export async function copyFileToSubFolder(fileFullPath, folderName= 'processed') {
+  const pathName = path.dirname(fileFullPath);
+  const baseName = path.basename(fileFullPath);
+  const origin = fileFullPath;
+  const newPath = path.join(pathName, folderName);
+  const destination = path.join(newPath, baseName);
+  try {
+    await fs.access(newPath);
+  } catch (error) {
+    await fs.mkdir(newPath);
+  }
+  try {
+    await fs.copyFile(origin, destination);
+  } catch (error) {
+    console.log("error copying file:", error);
+  }
+  return destination;
+}
 /**
  * Take in filename with path
  * Copy files to 'processed' directory
@@ -61,17 +87,10 @@ async function processAndCopyFile(fileFullPath, isPng, pngStrategy) {
  * @param {string[]} fileListFullPath
  * @returns {Promise<string>}
  */
-export async function copyFileToNewFolder(fileFullPath, folderName= 'processed') {
-  const pathName = path.dirname(fileFullPath);
-  const baseName = path.basename(fileFullPath);
+export async function copyFileToNewFolder(fileFullPath, destinationDirName) {
   const origin = fileFullPath;
-  const newPath = path.join(pathName, folderName);
-  const destination = path.join(newPath, baseName);
-  try {
-    await fs.access(newPath);
-  } catch (error) {
-    await fs.mkdir(newPath);
-  }
+  const baseName = path.basename(fileFullPath);
+  const destination = path.join(destinationDirName, baseName);
   try {
     await fs.copyFile(origin, destination);
   } catch (error) {
@@ -79,7 +98,6 @@ export async function copyFileToNewFolder(fileFullPath, folderName= 'processed')
   }
   return destination;
 }
-
 /**
  * Take in file with full path
  * Convert from PNG to JPG

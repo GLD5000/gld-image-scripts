@@ -4,7 +4,7 @@ import webp from "webp-converter";
 import {
   getImageDimensions,
   getEvenImageDimensions,
-  copyFileToNewFolder,
+  copyFileToSubFolder,
 } from "../imageProcessing/imageEditing.mjs";
 import ffmpeg from "@ffmpeg-installer/ffmpeg";
 import { webpmux_animateLocal } from "../../webp/webpConverterLocal.mjs";
@@ -110,7 +110,7 @@ async function makeWebpFrames(fileListFullPath) {
   return outputArray;
 }
 async function cropInputFrame(file, width, height) {
-  const oldFile = await copyFileToNewFolder(file, "old");
+  const oldFile = await copyFileToSubFolder(file, "old");
   await sharp(oldFile).extract({ left: 0, top: 0, width, height }).toFile(file);
 }
 /**
