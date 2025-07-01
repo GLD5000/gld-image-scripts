@@ -3,7 +3,7 @@ import { createTimestamp } from '../general/timestamp.mjs';
 import { createWebPAnimation } from './webpAnimationMaker.mjs';
 
 console.log('starting', createTimestamp());
-const { fileList } = await listFileFullPaths(`C:/Users/gareth.devlin/OneDrive - Whittard/Documents/assets/039 GWP LB Animated/WEB resize/Web 480_343`);
+const { fileList } = await listFileFullPaths();
 console.log('fileList:', fileList);
 await createWebPAnimation(fileList);
 // console.log('newFileList:', newFileList);
