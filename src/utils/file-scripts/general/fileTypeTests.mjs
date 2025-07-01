@@ -5,7 +5,8 @@ import path from "path";
  * @returns {boolean}
  */
 export function isFolder(fileString) {
-    return fileString.indexOf('.') === -1;
+    console.log('fileString',fileString)
+    return path.extname(fileString) === "";
 }
 /**
  * Check if file is image

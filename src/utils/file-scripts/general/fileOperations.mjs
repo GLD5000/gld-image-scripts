@@ -18,7 +18,7 @@ function getFileList(inputPath) {
  * @returns {string[]}
  */
 function getFolderList(inputPath) {
-  return getFileList(inputPath).filter((file) => isFolder(file));
+  return getFileListFullPath(inputPath).filter((file) => isFolder(file));
 }
 /**
  * Get list of files with paths from given path
@@ -37,20 +37,17 @@ function getFileListFullPath(inputPath) {
  * @returns {Promise<{fileList: string[], inputPath: string}>}
  */
 export async function listFileNames(inputPath) {
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
+  try {
+    const rl = getReadLine();
     if (inputPath) {
-      const fileList = getFileList(inputPath);
-      resolve({ fileList, inputPath });
       rl.close();
+      const fileList = getFileList(inputPath);
+      return { fileList, inputPath };
     }
 
-    rl.question("Please enter the directory path: ", (dirPath) => {
+    rl.question("Please enter the directory path: ", async (dirPath) => {
       if (!dirPath.trim()) {
-        console.log(
+        console.error(
           "Input should not be blank. Using current working directory."
         );
         dirPath = process.cwd(); // Set dirPath to the current working directory
@@ -58,15 +55,18 @@ export async function listFileNames(inputPath) {
 
       try {
         const fileList = getFileList(dirPath);
-        resolve({ fileList, inputPath: dirPath });
+        return { fileList, inputPath: dirPath };
       } catch (error) {
         console.error(`Error reading directory ${dirPath}:`, error);
-        reject(error);
+        return JSON.stringify(error);
       } finally {
         rl.close(); // Close the readline interface after operation
       }
     });
-  });
+  } catch (error) {
+    console.log("error", error);
+    return JSON.stringify(error);
+  }
 }
 /**
  * Gives a list of files (full path) for a given path from user prompt or function input
@@ -75,18 +75,15 @@ export async function listFileNames(inputPath) {
  * @returns {Promise<{fileList: string[], inputPath: string}>}
  */
 export async function listFileFullPaths(inputPath) {
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
+  try {
+    const rl = getReadLine();
     if (inputPath) {
-      resolve({
+      rl.close();
+
+      return {
         fileList: getFileListFullPath(inputPath),
         inputPath,
-      });
-      rl.close();
+      };
     }
     rl.question("Please enter the directory path: ", (dirPath) => {
       if (!dirPath.trim()) {
@@ -97,18 +94,20 @@ export async function listFileFullPaths(inputPath) {
       }
 
       try {
-        resolve({
+        return {
           fileList: getFileListFullPath(dirPath),
           inputPath: dirPath,
-        });
+        };
       } catch (error) {
         console.error(`Error reading directory ${dirPath}:`, error);
-        reject(error);
+        return JSON.stringify(error);
       } finally {
         rl.close(); // Close the readline interface after operation
       }
     });
-  });
+  } catch (error) {
+    return JSON.stringify(error);
+  }
 }
 /**
  * Gives an array of lists of files (full path) for a given path's subfolders
@@ -117,20 +116,13 @@ export async function listFileFullPaths(inputPath) {
  * @returns {Promise<{fileList: string[], inputPath: string}>}
  */
 export async function listFileFullPathsMulti(inputPath) {
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
+  try {
+    const rl = getReadLine();
     if (inputPath) {
-      const folderList = getFolderList(inputPath);
-      resolve({
-        fileLists: folderList.map((folder) => listFileFullPaths(folder)),
-        inputPath,
-      });
       rl.close();
+      return await getSubfolderArrays(inputPath);
     }
-    rl.question("Please enter the directory path: ", (dirPath) => {
+    rl.question("Please enter the directory path: ", async (dirPath) => {
       if (!dirPath.trim()) {
         console.error(
           "Input should not be blank. Using current working directory."
@@ -139,20 +131,40 @@ export async function listFileFullPathsMulti(inputPath) {
       }
 
       try {
-        const folderList = getFolderList(inputPath);
-        resolve({
-          fileLists: folderList.map((folder) => listFileFullPaths(folder)),
-          inputPath: dirPath,
-        });
+        return await getSubfolderArrays(dirPath);
       } catch (error) {
         console.error(`Error reading directory ${dirPath}:`, error);
-        reject(error);
+        return JSON.stringify(error);
       } finally {
         rl.close(); // Close the readline interface after operation
       }
     });
+  } catch (error) {
+    console.error(error);
+    return JSON.stringify(error);
+  }
+}
+function getReadLine() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
   });
 }
+
+async function getSubfolderArrays(inputPath) {
+  const folderList = getFolderList(inputPath);
+  const fileLists = [];
+  for (let i in folderList) {
+    console.log("folderList[i]", folderList[i]);
+
+    fileLists.push(await listFileFullPaths(folderList[i]));
+  }
+  return {
+    fileLists,
+    inputPath,
+  };
+}
+
 /**
  * Take in filename with path
  * Create 'processed' directory (if does not exist)
@@ -171,10 +183,10 @@ export async function getTargetPath(fileFullPath, options) {
   const pathName = path.dirname(fileFullPath);
   const baseNameNoExt = fileName || path.basename(fileFullPath).split(".")[0];
   const baseName = `${baseNameNoExt}${suffix}.${extension}`;
-  const newPath = folders && folders.length? await addFoldersToPath(
-    pathName,
-    folders
-  ): pathName;
+  const newPath =
+    folders && folders.length
+      ? await addFoldersToPath(pathName, folders)
+      : pathName;
   const destination = path.join(newPath, baseName);
   return destination;
 }
@@ -203,10 +215,10 @@ export async function addFolderToPath(pathName, folder) {
 export async function addFoldersToPath(pathName, folders) {
   let newPath = pathName;
   for (let i in folders) {
-    newPath = await addFolderToPath(newPath, folders[i])
+    newPath = await addFolderToPath(newPath, folders[i]);
   }
 
-    return newPath;
+  return newPath;
 }
 
 /**
