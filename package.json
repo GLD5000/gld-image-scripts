@@ -1,11 +1,13 @@
 {
   "scripts": {
-    "//image:process:jpg": "Process images, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
-    "image:process:jpg": "clear && node src/utils/file-scripts/imageProcessing/batchJpg.mjs",
-    "//image:process:webp-single": "Process one folder of images, converting png, jpg etc. to animated webp",
-    "image:process:webp-single": "clear && node src/utils/file-scripts/imageProcessing/batchWebp.mjs",
-    "//image:process:webp-multi": "Process multiple folders of images, converting png, jpg etc. to animated webp",
-    "image:process:webp-multi": "clear && node src/utils/file-scripts/imageProcessing/batchWebpMulti.mjs"
+    "//image:rename": "Process images, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
+    "image:rename": "clear && node src/utils/file-scripts/imageProcessing/batchJpg.mjs",
+    "//image:rename:resize-even": "Resizes images to even sizes, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
+    "image:rename:resize-even": "clear && node src/utils/file-scripts/imageProcessing/batchJpgEven.mjs",
+    "//frames-folder-animate-single": "Process one folder of images, converting png, jpg etc. to animated webp and mp4",
+    "frames-folder-animate-single": "clear && node src/utils/file-scripts/imageProcessing/batchWebp.mjs",
+    "//frames-folder-animate-multi": "Process multiple folders of images, converting png, jpg etc. to animated webp and mp4",
+    "frames-folder-animate-multi": "clear && node src/utils/file-scripts/imageProcessing/batchWebpMulti.mjs"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

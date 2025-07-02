@@ -11,9 +11,10 @@ import { isPngFile, isImageFile } from "../general/fileTypeTests.mjs";
  * Rename with dimensions/ lowercase etc.
  * Return array of new file names with paths
  * @param {string[]} fileListFullPath
+ * @param {boolean} shouldMakeEven
  * @returns {Promise<{newFileList: string[], backupList: string[]}>}
  */
-export async function renameFiles(fileListFullPath) {
+export async function renameFiles(fileListFullPath,shouldMakeEven = false) {
   try {
     const newFileList = [];
     const pngStrategy = fileListFullPath.some(
@@ -25,7 +26,7 @@ export async function renameFiles(fileListFullPath) {
       const isImage = isImageFile(file);
       if (isImage) {
         const isPng = isPngFile(file);
-        const movedFile = await processAndCopyFile(file, isPng, pngStrategy);
+        const movedFile = await processAndCopyFile(file, isPng, pngStrategy,shouldMakeEven);
         for (const file of movedFile) {
           const newFileName = await fileNameDimensions(file);
           newFileList.push(newFileName);
@@ -40,7 +41,6 @@ export async function renameFiles(fileListFullPath) {
   }
 }
 
-
 /**
  * Take in filename with path
  * Create 'processed' directory (if does not exist)
@@ -48,7 +48,10 @@ export async function renameFiles(fileListFullPath) {
  * @param {string[]} fileListFullPath
  * @returns {Promise<string>}
  */
-export async function copyFileToSubFolder(fileFullPath, folderName= 'processed') {
+export async function copyFileToSubFolder(
+  fileFullPath,
+  folderName = "processed"
+) {
   const pathName = path.dirname(fileFullPath);
   const baseName = path.basename(fileFullPath);
   const origin = fileFullPath;
@@ -71,9 +74,18 @@ export async function copyFileToSubFolder(fileFullPath, folderName= 'processed')
  * Copy files to 'processed' directory
  * Convert PNG to JPG and delete PNG as needed
  * @param {string} fileFullPath
+ * @param {boolean} isPng
+ * @param {string} pngStrategy
+ * @param {boolean} shouldMakeEven
  * @returns {Promise<string[]>}
  */
-async function processAndCopyFile(fileFullPath, isPng, pngStrategy) {
+async function processAndCopyFile(
+  fileFullPath,
+  isPng,
+  pngStrategy,
+  shouldMakeEven = false
+) {
+  shouldMakeEven && makeImageEven(fileFullPath);
   const workingFile = await copyFileToNewFolder(fileFullPath);
   if (!isPng || pngStrategy === "keep") return [workingFile];
   const shouldDelete = pngStrategy === "convert";
@@ -85,12 +97,18 @@ async function processAndCopyFile(fileFullPath, isPng, pngStrategy) {
  * Create 'processed' directory (if does not exist)
  * Copy files to 'processed' directory
  * @param {string[]} fileListFullPath
+ * @param {string[]} destinationDirName
  * @returns {Promise<string>}
  */
 export async function copyFileToNewFolder(fileFullPath, destinationDirName) {
   const origin = fileFullPath;
   const baseName = path.basename(fileFullPath);
   const destination = path.join(destinationDirName, baseName);
+  try {
+    await fs.access(destinationDirName);
+  } catch (error) {
+    await fs.mkdir(destinationDirName);
+  }
   try {
     await fs.copyFile(origin, destination);
   } catch (error) {
@@ -103,7 +121,7 @@ export async function copyFileToNewFolder(fileFullPath, destinationDirName) {
  * Convert from PNG to JPG
  * Delete the original JPG
  * @param {string} file
- * @param {Boolean} shouldDeletePng
+ * @param {boolean} shouldDeletePng
  * @returns {Promise<string[]>}
  */
 async function convertPngToJpg(file, shouldDeletePng = true) {
@@ -245,4 +263,8 @@ function appendFilename(filename, appendString) {
   const { pathName, baseNameNoExt, extName } = fullPathNameSplitter(filename);
   const newPath = `${pathName}${baseNameNoExt}${appendString}${extName}`;
   return newPath;
+}
+export async function makeImageEven(file) {
+  const { width, height, shouldCrop } = await getEvenImageDimensions(file);
+  shouldCrop && (await cropInputFrame(file, width, height));
 }
