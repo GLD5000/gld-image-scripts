@@ -233,6 +233,10 @@ export async function getImageDimensions(fileNameFullPath) {
   const { width, height } = metadata;
   return { width, height };
 }
+export async function cropInputFrame(file, width, height) {
+  const oldFile = await copyFileToSubFolder(file, "old");
+  await sharp(oldFile).extract({ left: 0, top: 0, width, height }).toFile(file);
+}
 export async function getEvenImageDimensions(fileNameFullPath) {
   const sharpInstance = sharp(fileNameFullPath);
   const metadata = await sharpInstance.metadata();
