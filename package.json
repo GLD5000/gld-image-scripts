@@ -2,6 +2,9 @@
   "scripts": {
     "//batch:renamer": "Batch rename images to e.g. de-duplicate file names based on parent folders",
     "batch:renamer": "clear && node src/utils/file-scripts/imageProcessing/batchRename.mjs",
+        "//image:object": "Create TypeScript image object files for use in codebase",
+    "image:object": "clear && node src/utils/file-scripts/imageProcessing/batchImageObject.mjs",
+
     "//image:normalise": "Process images, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
     "image:normalise": "clear && node src/utils/file-scripts/imageProcessing/batchJpg.mjs",
     "//image:normalise:resize-even": "Resizes images to even sizes, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
