@@ -47,7 +47,7 @@ async function makeMp4Animation(fileListFullPath) {
     dirName,
     "processed",
     "animation",
-    `output_${width}_${height}.mp4`
+    `output-mp_${width}_${height}.mp4`
   )}"`;
   console.log(ffmpegCommand);
   exec(ffmpegCommand, (error, stdout, stderr) => {
@@ -76,7 +76,7 @@ async function makeWebpAnimation(outputArray) {
   try {
     const { width, height } = await getImageDimensions(outputArray[0]);
     const animationPath = await getTargetPath(outputArray[0], {
-      fileName: "output",
+      fileName: "output-webp",
       folders:['animation'],
       suffix: `_${width}_${height}`,
     });
