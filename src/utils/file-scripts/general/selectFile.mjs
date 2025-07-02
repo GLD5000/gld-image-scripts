@@ -7,7 +7,7 @@ import path from 'path';
     try {
         const testDir =
             'C:\\Users\\gareth.devlin\\OneDrive - Whittard\\Documents\\assets\\018 Autumn Homepage\\Exports\\Updated 6\\';
-        console.log('starting', createTimestamp());
+        console.log('starting', createTimestampArrow());
         const { fileList } = await listFileFullPaths(testDir);
         console.log('fileList:', fileList);
         const filteredFileList = fileList.filter((fileLine) =>

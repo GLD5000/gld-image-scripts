@@ -6,7 +6,7 @@ import { saveImageObject } from './saveImageObject.mjs';
 import path from 'path';
 
 
-console.log('starting', createTimestamp());
+console.log('starting', createTimestampArrow());
 const { fileList } = await listFileFullPaths();
 // console.log('fileList:', fileList);
 const { newFileList } = await renameFiles(fileList);

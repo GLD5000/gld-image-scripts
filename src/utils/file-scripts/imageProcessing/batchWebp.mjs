@@ -2,7 +2,7 @@ import { listFileFullPaths } from '../general/fileOperations.mjs';
 import { createTimestamp } from '../general/timestamp.mjs';
 import { createWebPAnimation } from './webpAnimationMaker.mjs';
 
-console.log('starting', createTimestamp());
+console.log('starting', createTimestampArrow());
 const { fileList } = await listFileFullPaths();
 console.log('fileList:', fileList);
 await createWebPAnimation(fileList);

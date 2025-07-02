@@ -11,7 +11,7 @@ export const imageMapper = ${JSON.stringify(objectIn.imageMapper)};`.replaceAll(
     quoteRegex,
     "$1"
   );
-  const fileName = `${createTimestamp()}.ts`;
+  const fileName = `${createTimestampArrow()}.ts`;
   const fullJsonFilePath = pathIn
     ? path.join(pathIn, fileName)
     : path.join(process.cwd(), "public", "imageObjects", fileName);

@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "//image:rename": "Process images, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
-    "image:rename": "clear && node src/utils/file-scripts/imageProcessing/batchJpg.mjs",
-    "//image:rename:resize-even": "Resizes images to even sizes, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
-    "image:rename:resize-even": "clear && node src/utils/file-scripts/imageProcessing/batchJpgEven.mjs",
+    "//image:normalise": "Process images, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
+    "image:normalise": "clear && node src/utils/file-scripts/imageProcessing/batchJpg.mjs",
+    "//image:normalise:resize-even": "Resizes images to even sizes, converting png to jpg and appending dimensions to filenames ready for upload to SFCC",
+    "image:normalise:resize-even": "clear && node src/utils/file-scripts/imageProcessing/batchJpgEven.mjs",
     "//frames-folder-animate-single": "Process one folder of images, converting png, jpg etc. to animated webp and mp4",
     "frames-folder-animate-single": "clear && node src/utils/file-scripts/imageProcessing/batchWebp.mjs",
     "//frames-folder-animate-multi": "Process multiple folders of images, converting png, jpg etc. to animated webp and mp4",
