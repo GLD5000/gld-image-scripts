@@ -86,7 +86,7 @@ async function processAndCopyFile(
   shouldMakeEven = false
 ) {
   shouldMakeEven && await makeImageEven(fileFullPath);
-  const workingFile = await copyFileToNewFolder(fileFullPath);
+  const workingFile = await copyFileToSubFolder(fileFullPath);
   if (!isPng || pngStrategy === "keep") return [workingFile];
   const shouldDelete = pngStrategy === "convert";
   return await convertPngToJpg(workingFile, shouldDelete);
