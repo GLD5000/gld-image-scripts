@@ -85,7 +85,7 @@ async function processAndCopyFile(
   pngStrategy,
   shouldMakeEven = false
 ) {
-  shouldMakeEven && makeImageEven(fileFullPath);
+  shouldMakeEven && await makeImageEven(fileFullPath);
   const workingFile = await copyFileToNewFolder(fileFullPath);
   if (!isPng || pngStrategy === "keep") return [workingFile];
   const shouldDelete = pngStrategy === "convert";

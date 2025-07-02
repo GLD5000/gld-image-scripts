@@ -1,5 +1,5 @@
 import { listFileFullPaths } from '../general/fileOperations.mjs';
-import { createTimestamp } from '../general/timestamp.mjs';
+import { createTimestampArrow } from '../general/timestamp.mjs';
 import { createWebPAnimation } from './webpAnimationMaker.mjs';
 
 console.log('starting', createTimestampArrow());

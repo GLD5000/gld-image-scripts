@@ -1,5 +1,5 @@
 import { listFileFullPaths } from './fileOperations.mjs';
-import { createTimestamp } from './timestamp.mjs';
+import { createTimestampArrow } from './timestamp.mjs';
 import { selectImageFromText } from './selectLineFromText.mjs';
 import path from 'path';
 
