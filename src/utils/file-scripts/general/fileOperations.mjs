@@ -222,6 +222,7 @@ export async function addFoldersToPath(pathName, folders) {
 export function getPathParts(fileFullPath) {
   const baseName = path.basename(fileFullPath);
   const dirName = path.dirname(fileFullPath);
-  const [baseNameNoExtension, extension] = baseName.split(".");
+  const extension = path.extname(fileFullPath);
+  const baseNameNoExtension = baseName.replace(extension,'');
   return { baseName, baseNameNoExtension, extension, dirName };
 }

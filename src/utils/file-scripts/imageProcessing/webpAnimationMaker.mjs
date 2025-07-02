@@ -41,7 +41,7 @@ async function makeMp4Animation(fileListFullPath) {
   // -stream_loop -1
   const ffmpegCommand = `"${ffmpeg.path}" -framerate 1 -i "${path.join(
     dirName,
-    `%d.${extension}`
+    `%d${extension}`
   )}" -c:v libx264 -pix_fmt yuv420p -y "${path.join(
     dirName,
     "processed",
