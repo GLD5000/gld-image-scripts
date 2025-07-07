@@ -19,6 +19,7 @@
     "webp-converter": "^2.3.3"
   },
   "devDependencies": {
+    "@gld5000k/readline": "^1.0.2",
     "@gld5000k/timestamp": "^1.0.9"
   }
 }
