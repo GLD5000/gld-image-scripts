@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { createTimestampArrow } from "../general/timestamp.mjs";
+import { getTimestamp } from '@gld5000k/timestamp';
 
 export function saveImageObject(objectIn, pathIn) {
   const quoteRegex = /"(imageDimensions\[[^\]]+\])"/g;
@@ -11,7 +11,7 @@ export const imageMapper = ${JSON.stringify(objectIn.imageMapper)};`.replaceAll(
     quoteRegex,
     "$1"
   );
-  const fileName = `${createTimestampArrow()}.ts`;
+  const fileName = `${getTimestamp()}.ts`;
   const fullJsonFilePath = pathIn
     ? path.join(pathIn, fileName)
     : path.join(process.cwd(), "public", "imageObjects", fileName);

@@ -1,8 +1,8 @@
 import { listFileFullPaths } from "../general/fileOperations.mjs";
-import { createTimestampArrow } from "../general/timestamp.mjs";
+import { logTimestampArrow } from "@gld5000k/timestamp";
 import { suffixFolderName } from "../general/renameFiles.mjs";
 
-console.log("starting", createTimestampArrow());
+logTimestampArrow();
 const { fileList } = await listFileFullPaths();
 console.log("fileList:", fileList);
 for (let i in fileList) {

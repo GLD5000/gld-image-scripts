@@ -1,10 +1,10 @@
-import { listFileFullPaths } from '../general/fileOperations.mjs';
-import { createTimestampArrow } from '../general/timestamp.mjs';
-import { createWebPAnimation } from './webpAnimationMaker.mjs';
+import { listFileFullPaths } from "../general/fileOperations.mjs";
+import { logTimestampArrow } from "@gld5000k/timestamp";
+import { createWebPAnimation } from "./webpAnimationMaker.mjs";
 
-console.log('starting', createTimestampArrow());
+logTimestampArrow();
 const { fileList } = await listFileFullPaths();
-console.log('fileList:', fileList);
+console.log("fileList:", fileList);
 await createWebPAnimation(fileList);
 // console.log('newFileList:', newFileList);
 // const fileObject = await makeImageObjectsV4(newFileList);
