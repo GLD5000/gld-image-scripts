@@ -5,10 +5,8 @@ import path from 'path';
 
 (async () => {
     try {
-        const testDir =
-            'C:\\Documents\\assets\\018 Autumn Homepage\\Exports\\Updated 6\\';
         logTimestampArrow();
-        const { fileList } = await listFileFullPaths(testDir);
+        const { fileList } = await listFileFullPaths();
         console.log('fileList:', fileList);
         const filteredFileList = fileList.filter((fileLine) =>
             ['.jpg', '.png', '.jpeg', '.gif'].includes(path.extname(fileLine))
