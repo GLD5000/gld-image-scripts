@@ -201,7 +201,7 @@ export async function fileNameDimensions(fileNameFullPath) {
 function processFilename(filename) {
   const cleanedName = filename
     .replaceAll(/[-\s]+/g, "-")
-    .replace(/(\_[\d]+)+$/g, "")
+    .replace(/([\_x\-][\d]+)+$/g, "")
     .toLowerCase();
   //console.log('cleanedName:', cleanedName);
   return moveBreakpointToFilenameEnd(cleanedName).replaceAll(/[_-]+/g, "-");
