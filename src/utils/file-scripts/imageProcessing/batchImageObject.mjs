@@ -6,7 +6,7 @@ import path from "path";
 
 logTimestampArrow();
 const { fileList } = await listFileFullPaths();
-// console.log('fileList:', fileList);
+console.log('fileList:', fileList);
 // const { newFileList } = await renameFiles(fileList);
 // console.log('newFileList:', newFileList);
 const fileObject = await makeImageObjectsV4(fileList);

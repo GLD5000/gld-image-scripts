@@ -122,11 +122,11 @@ function makeImageObjectDimensions(baseName, cleanDirPath) {
 function extractWidthHeight(fileName) {
     if (fileName.indexOf('_') === -1)
         throw new Error('File name does not have dimensions.');
-    const dimensionsRegex = /([\d]+\_[\d]+)$/;
+    const dimensionsRegex = /([\d]+[^\d][\d]+)$/;
     const dimensionsPortion = fileName
         .replace(/(\.[\w]+)$/, '')
         .match(dimensionsRegex)[0];
-    const [widthPx, heightPx] = dimensionsPortion.split('_');
+    const [widthPx, heightPx] = dimensionsPortion.replaceAll(/[^\d]/g,'_').split('_');
     const widthRem = `${Math.round((Number(widthPx) / 16) * 1000) * 0.001}`;
     const heightRem = `${Math.round((Number(heightPx) / 16) * 1000) * 0.001}`;
     return { widthPx, heightPx, widthRem, heightRem };
