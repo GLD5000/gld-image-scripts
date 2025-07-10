@@ -1,3 +1,3 @@
-import { runSelector } from '@gld5000-test/script-selector'
+import { runSelector } from '@gld5000-cli/script-selector'
 
-// runSelector();
+runSelector();
