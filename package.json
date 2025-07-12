@@ -1,4 +1,31 @@
 {
+  "name": "@gld5000-cli/image-scripts",
+  "version": "1.0.0",
+  "description": "A useful collection of image processing scripts",
+  "keywords": [
+    "CLI",
+    "Sharp",
+    "FFMPEG",
+    "WEBP",
+    "WEBPMUX",
+    "Muxing",
+    "Crop",
+    "Scale",
+    "Image",
+    "Process"
+  ],
+  "homepage": "https://github.com/GLD5000/image-scripts#readme",
+  "bugs": {
+    "url": "https://github.com/GLD5000/image-scripts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GLD5000/image-scripts.git"
+  },
+  "license": "MIT",
+  "author": "GLD5000",
+  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
     "//batch:renamer": "Batch rename images to e.g. de-duplicate file names based on parent folders",
     "batch:renamer": "clear && node src/utils/file-scripts/imageProcessing/batchRename.mjs",
