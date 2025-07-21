@@ -46,13 +46,13 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@gld5000-cli/readline": "^1.0.6",
-    "@gld5000-cli/script-selector": "^1.1.5",
+    "@gld5000-cli/script-selector": "^1.1.6",
     "@gld5000k/timestamp": "^1.0.9",
     "sharp": "^0.34.2",
     "webp-converter": "^2.3.3"
   },
   "peerDependencies": {
     "@gld5000-cli/readline": "^1.0.6",
-    "@gld5000-cli/script-selector": "^1.1.5"
+    "@gld5000-cli/script-selector": "^1.1.6"
   }
 }
