@@ -1,6 +1,6 @@
 {
   "name": "@gld5000-cli/image-scripts",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A useful collection of image processing scripts",
   "keywords": [
     "CLI",
