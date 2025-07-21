@@ -25,7 +25,8 @@
   "license": "MIT",
   "author": "GLD5000",
   "type": "commonjs",
-  "main": "index.js",
+  "bin": "bin/index.mjs",
+  "main": "src/index.mjs",
   "scripts": {
     "//batch:renamer": "Batch rename images to e.g. de-duplicate file names based on parent folders",
     "batch:renamer": "clear && node src/utils/file-scripts/imageProcessing/batchRename.mjs",
